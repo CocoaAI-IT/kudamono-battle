@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Smabura fruit fighter icon">
+  <rect width="64" height="64" rx="12" fill="#0a1424"/>
+  <path d="M34 10c5-6 12-7 17-5-2 7-7 12-15 13z" fill="#3fc66b"/>
+  <path d="M27 12c-3-6-9-8-15-7 1 7 6 12 14 14z" fill="#2ba958"/>
+  <path d="M15 31c0-12 7-20 17-20s17 8 17 20c0 13-8 24-17 24S15 44 15 31z" fill="#f24755"/>
+  <path d="M21 27c3-3 7-3 10 0M34 27c3-3 7-3 10 0" fill="none" stroke="#10151f" stroke-width="4" stroke-linecap="round"/>
+  <path d="M24 41c5 4 12 4 17 0" fill="none" stroke="#fff2c5" stroke-width="4" stroke-linecap="round"/>
+  <path d="M21 35h22" stroke="#29f2f2" stroke-width="4" stroke-linecap="round"/>
+  <path d="M23 20h2M31 18h2M39 20h2M19 38h2M45 38h2" stroke="#ffd76a" stroke-width="3" stroke-linecap="round"/>
+</svg>
