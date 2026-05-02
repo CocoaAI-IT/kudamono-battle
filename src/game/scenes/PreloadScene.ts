@@ -9,10 +9,10 @@ export class PreloadScene extends Phaser.Scene {
     this.load.image('title-key-art', 'assets/ui/title-key-art.webp');
     this.load.image('portrait-strawberry', 'assets/ui/portrait-strawberry-samurai.webp');
     this.load.image('portrait-banana', 'assets/ui/portrait-banana-brawler.webp');
-    this.load.image('portrait-grape', 'assets/ui/portrait-grape-gunner.png');
-    this.load.image('portrait-watermelon', 'assets/ui/portrait-watermelon-tank.png');
-    this.load.image('portrait-pineapple', 'assets/ui/portrait-pineapple-trapper.png');
-    this.load.image('portrait-cherry', 'assets/ui/portrait-cherry-ninja.png');
+    this.load.image('portrait-grape', 'assets/ui/portrait-grape-gunner.jpg');
+    this.load.image('portrait-watermelon', 'assets/ui/portrait-watermelon-tank.jpg');
+    this.load.image('portrait-pineapple', 'assets/ui/portrait-pineapple-trapper.jpg');
+    this.load.image('portrait-cherry', 'assets/ui/portrait-cherry-ninja.jpg');
     this.load.image('background-kitchen', 'assets/kitchen-stage.webp');
     this.load.image('background-dark-board', 'assets/dark-board-stage.jpg');
     const motions = ['idle', 'run', 'jump', 'quick', 'heavy', 'hurt'];
