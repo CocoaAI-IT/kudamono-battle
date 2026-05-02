@@ -64,32 +64,12 @@ export class GameScene extends Phaser.Scene {
     this.platforms = this.physics.add.staticGroup();
 
     for (const platformDef of PLATFORMS) {
-      const visual = this.add.rectangle(
-        platformDef.x,
-        platformDef.y,
-        platformDef.width,
-        platformDef.height,
-        platformDef.color,
-        0.93
-      );
-      visual.setStrokeStyle(3, platformDef.edge, 0.92);
-      visual.setDepth(3);
-
-      const glow = this.add.rectangle(
-        platformDef.x,
-        platformDef.y - platformDef.height / 2 + 2,
-        platformDef.width - 22,
-        3,
-        platformDef.edge,
-        0.58
-      );
-      glow.setDepth(4);
-
-      this.physics.add.existing(visual, true);
-      const body = visual.body as Phaser.Physics.Arcade.StaticBody;
+      const collider = this.add.zone(platformDef.x, platformDef.y, platformDef.width, platformDef.height);
+      this.physics.add.existing(collider, true);
+      const body = collider.body as Phaser.Physics.Arcade.StaticBody;
       body.setSize(platformDef.width, platformDef.height);
       body.updateFromGameObject();
-      this.platforms.add(visual);
+      this.platforms.add(collider);
     }
 
     const dangerLine = this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT + 8, GAME_WIDTH, 4, 0xff3f6d, 0.78);
@@ -212,7 +192,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   private updateHud(): void {
-    this.stockText.setText(`${this.player.stats.shortName} ${'◆'.repeat(Math.max(0, this.player.stocks))}    ${this.cpu.stats.shortName} ${'◆'.repeat(Math.max(0, this.cpu.stocks))}`);
+    this.stockText.setText(`${this.player.stats.shortName} ${'x'.repeat(Math.max(0, this.player.stocks))}    ${this.cpu.stats.shortName} ${'x'.repeat(Math.max(0, this.cpu.stocks))}`);
     this.damageText.setText(
       `1P ${Math.round(this.player.damage)}%    CPU ${Math.round(this.cpu.damage)}%`
     );

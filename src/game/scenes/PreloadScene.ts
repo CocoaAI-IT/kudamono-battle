@@ -6,12 +6,12 @@ export class PreloadScene extends Phaser.Scene {
   }
 
   preload(): void {
-    this.load.svg('background', 'assets/cyber-dojo-background.svg', { width: 1280, height: 720 });
+    this.load.image('background', 'assets/kitchen-stage.webp');
     const motions = ['idle', 'run', 'jump', 'quick', 'heavy', 'hurt'];
 
     for (const motion of motions) {
-      this.load.image(`strawberry-${motion}`, `assets/characters/strawberry-samurai-${motion}.png`);
-      this.load.image(`banana-${motion}`, `assets/characters/banana-brawler-${motion}.png`);
+      this.load.image(`strawberry-${motion}`, `assets/characters/strawberry-samurai-${motion}.webp`);
+      this.load.image(`banana-${motion}`, `assets/characters/banana-brawler-${motion}.webp`);
     }
   }
 

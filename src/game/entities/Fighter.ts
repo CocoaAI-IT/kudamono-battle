@@ -55,8 +55,8 @@ export class Fighter {
     this.sprite.setCollideWorldBounds(false);
 
     const body = this.sprite.body as Phaser.Physics.Arcade.Body;
-    body.setSize(206, 336);
-    body.setOffset(68, 72);
+    body.setSize(144, 250);
+    body.setOffset(56, 50);
   }
 
   get isGrounded(): boolean {

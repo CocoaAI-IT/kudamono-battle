@@ -26,8 +26,8 @@ Open `http://127.0.0.1:5173/`.
 - 1P vs CPU
 - 3-stock match
 - Damage-scaled knockback
-- Fixed cyber dojo stage
-- Generated anthropomorphic fruit character motion frames
+- Generated kitchen stage with collision aligned to the cutting board and plates
+- Optimized WebP anthropomorphic fruit character motion frames
 
 ## Build and Deploy
 
