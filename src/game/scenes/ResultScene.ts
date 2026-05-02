@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { getCharacterSelectCard } from '../data/fighters';
 import { DEFAULT_MATCH_CONFIG } from '../data/match';
 import { GAME_HEIGHT, GAME_WIDTH, STAGES } from '../data/stage';
 import type { ResultPayload } from '../types';
@@ -24,8 +25,11 @@ export class ResultScene extends Phaser.Scene {
     this.add.image(GAME_WIDTH / 2, GAME_HEIGHT / 2, stage.backgroundTexture).setAlpha(0.7);
     this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x06101f, 0.5);
 
-    const title = payload.winner === 'player' ? 'BERRY WINS' : payload.winner === 'cpu' ? 'NANA WINS' : 'DRAW';
-    const color = payload.winner === 'player' ? '#83f7ff' : payload.winner === 'cpu' ? '#ff91b1' : '#f4f7ff';
+    const playerCard = getCharacterSelectCard(payload.config.playerCharacter);
+    const cpuCard = getCharacterSelectCard(payload.config.cpuCharacter);
+    const winnerCard = payload.winner === 'player' ? playerCard : payload.winner === 'cpu' ? cpuCard : undefined;
+    const title = winnerCard ? `${winnerCard.shortName} WINS` : 'DRAW';
+    const color = winnerCard ? `#${winnerCard.accent.toString(16).padStart(6, '0')}` : '#f4f7ff';
 
     this.add.text(GAME_WIDTH / 2, 245, title, {
       fontFamily: 'Inter, Arial, sans-serif',
@@ -49,7 +53,7 @@ export class ResultScene extends Phaser.Scene {
       this.scene.start('GameScene', this.payload.config);
     });
     this.createButton(GAME_WIDTH / 2, 462, 'CHARACTER SELECT', () => {
-      this.scene.start('CharacterSelectScene');
+      this.scene.start('CharacterSelectScene', this.payload.config);
     }, 300);
     this.createButton(GAME_WIDTH / 2 + 275, 462, 'TITLE', () => {
       this.scene.start('TitleScene');
@@ -72,7 +76,7 @@ export class ResultScene extends Phaser.Scene {
     }
 
     if (this.characterSelectKey && Phaser.Input.Keyboard.JustDown(this.characterSelectKey)) {
-      this.scene.start('CharacterSelectScene');
+      this.scene.start('CharacterSelectScene', this.payload.config);
     }
 
     if (this.titleKey && Phaser.Input.Keyboard.JustDown(this.titleKey)) {

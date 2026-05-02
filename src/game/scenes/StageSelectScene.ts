@@ -25,6 +25,7 @@ export class StageSelectScene extends Phaser.Scene {
   create(config: MatchConfig = DEFAULT_MATCH_CONFIG): void {
     this.config = config;
     this.selected = config.stage;
+    this.visuals = [];
     this.add.image(GAME_WIDTH / 2, GAME_HEIGHT / 2, 'title-key-art').setDepth(0).setAlpha(0.68);
     this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x07101d, 0.58);
 
@@ -42,7 +43,12 @@ export class StageSelectScene extends Phaser.Scene {
     });
 
     this.renderStages();
-    this.createButton(170, 640, 'BACK', () => this.scene.start('CharacterSelectScene'));
+    this.createButton(170, 640, 'BACK', () => {
+      this.scene.start('CharacterSelectScene', {
+        ...this.config,
+        stage: this.selected
+      });
+    });
     this.createButton(1072, 640, 'START MATCH', () => this.startMatch(), 0x29b978, 260);
     this.bindKeys();
     this.refreshSelection();
@@ -62,7 +68,10 @@ export class StageSelectScene extends Phaser.Scene {
     }
 
     if (this.escKey && Phaser.Input.Keyboard.JustDown(this.escKey)) {
-      this.scene.start('CharacterSelectScene');
+      this.scene.start('CharacterSelectScene', {
+        ...this.config,
+        stage: this.selected
+      });
     }
   }
 

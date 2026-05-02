@@ -15,7 +15,7 @@ Title -> Character Select -> Stage Select -> Game -> Result
 | 操作 | 遷移先 | 用途 |
 | --- | --- | --- |
 | `R` / REMATCH | Game | 同じキャラクターとステージでもう一度遊ぶ。 |
-| `C` / CHARACTER SELECT | Character Select | キャラクター選択からやり直す。 |
+| `C` / CHARACTER SELECT | Character Select | 現在の選択状態を引き継いだままキャラクター選択からやり直す。 |
 | `T` / TITLE | Title | タイトル画面へ戻る。 |
 
 ## タイトル画面

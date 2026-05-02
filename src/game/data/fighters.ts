@@ -400,6 +400,10 @@ export const CHARACTER_SELECT_CARDS: CharacterSelectCard[] = CHARACTER_KEYS.map(
   };
 });
 
+export function getCharacterSelectCard(characterKey: CharacterKey): CharacterSelectCard {
+  return CHARACTER_SELECT_CARDS.find((character) => character.key === characterKey) ?? CHARACTER_SELECT_CARDS[0];
+}
+
 export function createFighterStats(
   characterKey: CharacterKey,
   id: FighterId,
