@@ -35,27 +35,16 @@ On touch devices, use the left stick for movement and direction, then tap `A` fo
 
 ## Moves
 
-Strawberry Samurai:
+Each fighter uses the same input grid: neutral/side/up/down plus normal or special.
 
-- Neutral normal: Seed Jab
-- Side normal: Berry Blade
-- Up normal: Leaf Upper
-- Down normal: Low Vine Cut
-- Neutral special: Pectin Pulse
-- Side special: Jam Dash
-- Up special: Leaf Lift
-- Down special: Jam Spike
-
-Banana Brawler:
-
-- Neutral normal: Peel Pop
-- Side normal: Peel Hook
-- Up normal: Stem Upper
-- Down normal: Banana Sweep
-- Neutral special: Potassium Burst
-- Side special: Slipstream Rush
-- Up special: Peel Copter
-- Down special: Peel Drop
+| Fighter | Type | Signature specials |
+| --- | --- | --- |
+| Strawberry Samurai | Speed swordsman | Pectin Pulse, Jam Dash, Leaf Lift, Jam Spike |
+| Banana Brawler | Midweight brawler | Potassium Burst, Slipstream Rush, Peel Copter, Peel Drop |
+| Grape Gunner | Ranged zoner | Grape Shot, Cluster Burst, Vine Swing, Sticky Juice Mine |
+| Watermelon Tank | Super heavyweight | Seed Cannon, Melon Charge, Rind Rocket, Heavy Drop |
+| Pineapple Trapper | Trap controller | Syrup Trap, Pine Roll, Crown Lift, Spike Field |
+| Cherry Ninja | Rushdown combo | Double Pop, Cherry Blink, Stem Hook, Split Step |
 
 ## Current Scope
 
@@ -63,8 +52,10 @@ Banana Brawler:
 - 1P vs CPU
 - 3-stock match
 - Damage-scaled knockback
+- Six-character initial roster
+- Lightweight projectile, trap, armor, and multi-hit attack support
 - Generated kitchen stage with collision aligned to the cutting board and plates
-- Optimized WebP anthropomorphic fruit character motion frames
+- Anthropomorphic fruit character motion frames and portraits
 
 ## Docs
 

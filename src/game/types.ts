@@ -1,6 +1,6 @@
 export type FighterId = 'player' | 'cpu';
 
-export type CharacterKey = 'strawberry' | 'banana';
+export type CharacterKey = 'strawberry' | 'banana' | 'grape' | 'watermelon' | 'pineapple' | 'cherry';
 
 export type StageKey = 'kitchen';
 
@@ -11,6 +11,8 @@ export type MoveDirection = 'neutral' | 'side' | 'up' | 'down';
 export type AttackButton = 'normal' | 'special';
 
 export type AttackKind = `${AttackButton}-${MoveDirection}`;
+
+export type AttackType = 'melee' | 'projectile' | 'trap' | 'armor' | 'multiHit';
 
 export type FighterMotion = 'idle' | 'run' | 'jump' | 'quick' | 'heavy' | 'hurt';
 
@@ -84,8 +86,15 @@ export type AttackSpec = {
   launchY: number;
   launchYGrowth: number;
   selfFreezeMs: number;
+  attackType?: AttackType;
   selfVelocityX?: number;
   selfVelocityY?: number;
+  projectileSpeed?: number;
+  projectileLifetimeMs?: number;
+  trapLifetimeMs?: number;
+  armorMs?: number;
+  hitCount?: number;
+  hitIntervalMs?: number;
 };
 
 export type AttackRuntime = {
@@ -97,6 +106,11 @@ export type AttackRuntime = {
   rect: Phaser.GameObjects.Rectangle;
   hit: boolean;
   spec: AttackSpec;
+  fixedPosition?: boolean;
+  velocityX?: number;
+  velocityY?: number;
+  hitsDone: number;
+  nextHitAt: number;
 };
 
 export type MatchWinner = FighterId | 'draw';

@@ -144,10 +144,20 @@ export class Fighter {
   startAttack(kind: AttackKind): AttackRuntime {
     const now = this.scene.time.now;
     const spec = this.stats.moves[kind];
+    const attackType = spec.attackType ?? 'melee';
+    const activeDuration = attackType === 'projectile'
+      ? spec.projectileLifetimeMs ?? spec.activeMs
+      : attackType === 'trap'
+        ? spec.trapLifetimeMs ?? spec.activeMs
+        : spec.activeMs;
     this.attackLockedUntil = now + spec.windupMs + spec.activeMs + spec.recoveryMs;
     this.stunUntil = Math.max(this.stunUntil, now + spec.selfFreezeMs);
     this.attackMotion = spec.motion;
     this.setMotion(spec.motion);
+
+    if (spec.armorMs) {
+      this.invincibleUntil = Math.max(this.invincibleUntil, now + spec.armorMs);
+    }
 
     if (spec.selfVelocityX) {
       this.sprite.setVelocityX(this.facing * spec.selfVelocityX);
@@ -160,7 +170,7 @@ export class Fighter {
 
     const x = this.sprite.x + this.facing * spec.offsetX;
     const y = this.sprite.y + spec.offsetY;
-    const color = spec.button === 'normal' ? this.stats.tint : this.stats.accent;
+    const color = this.getAttackColor(attackType, spec.button === 'normal' ? this.stats.tint : this.stats.accent);
     const rect = this.scene.add.rectangle(x, y, spec.reach, spec.height, color, 0.18);
     rect.setStrokeStyle(2, color, 0.75);
     rect.setDepth(12);
@@ -173,10 +183,15 @@ export class Fighter {
       kind,
       startsAt: now,
       activeAt: now + spec.windupMs,
-      expiresAt: now + spec.windupMs + spec.activeMs,
+      expiresAt: now + spec.windupMs + activeDuration,
       rect,
       hit: false,
-      spec
+      spec,
+      fixedPosition: attackType === 'projectile' || attackType === 'trap',
+      velocityX: attackType === 'projectile' ? this.facing * (spec.projectileSpeed ?? 0) : 0,
+      velocityY: 0,
+      hitsDone: 0,
+      nextHitAt: now + spec.windupMs
     };
   }
 
@@ -186,13 +201,14 @@ export class Fighter {
     }
 
     const now = this.scene.time.now;
+    const multiHit = attack.spec.attackType === 'multiHit';
     const launchDirection: Facing = source.sprite.x <= this.sprite.x ? 1 : -1;
     const knockback = (attack.spec.baseKnockback + this.damage * attack.spec.knockbackGrowth) / this.stats.weight;
     const launchY = (attack.spec.launchY + this.damage * attack.spec.launchYGrowth) / this.stats.weight;
     this.damage = Math.min(999, this.damage + attack.spec.damage);
-    this.stunUntil = now + 180 + this.damage * 2.1;
-    this.invincibleUntil = now + 260;
-    this.hurtUntil = now + 360;
+    this.stunUntil = now + (multiHit ? 80 + this.damage * 0.75 : 180 + this.damage * 2.1);
+    this.invincibleUntil = now + (multiHit ? 38 : 260);
+    this.hurtUntil = now + (multiHit ? 220 : 360);
     this.sprite.setVelocity(launchDirection * knockback, launchY);
     this.setMotion('hurt');
     this.flash(attack.spec.button === 'special' ? 0xffffff : source.stats.accent);
@@ -298,6 +314,22 @@ export class Fighter {
       duration: motion === 'quick' ? 140 : 210,
       onComplete: () => this.attackEffect?.destroy()
     });
+  }
+
+  private getAttackColor(attackType: string, fallback: number): number {
+    if (attackType === 'projectile') {
+      return this.stats.accent;
+    }
+
+    if (attackType === 'trap') {
+      return 0xffc857;
+    }
+
+    if (attackType === 'armor') {
+      return 0xffffff;
+    }
+
+    return fallback;
   }
 
   private emitJumpBurst(): void {

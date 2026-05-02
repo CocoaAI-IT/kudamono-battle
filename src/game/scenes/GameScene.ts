@@ -168,6 +168,7 @@ export class GameScene extends Phaser.Scene {
 
   private updateAttacks(): void {
     const now = this.time.now;
+    const deltaSeconds = this.game.loop.delta / 1000;
     const retainedAttacks: AttackRuntime[] = [];
 
     for (const attack of this.attacks) {
@@ -175,17 +176,24 @@ export class GameScene extends Phaser.Scene {
       const target = attack.ownerId === 'player' ? this.cpu : this.player;
       const direction = owner.facing;
       const active = now >= attack.activeAt && now <= attack.expiresAt;
+      const attackType = attack.spec.attackType ?? 'melee';
 
-      attack.rect.setPosition(owner.sprite.x + direction * attack.spec.offsetX, owner.sprite.y + attack.spec.offsetY);
+      if (!attack.fixedPosition) {
+        attack.rect.setPosition(owner.sprite.x + direction * attack.spec.offsetX, owner.sprite.y + attack.spec.offsetY);
+      } else if (active) {
+        attack.rect.x += (attack.velocityX ?? 0) * deltaSeconds;
+        attack.rect.y += (attack.velocityY ?? 0) * deltaSeconds;
+      }
+
       attack.rect.setVisible(active);
 
-      if (active && !attack.hit && this.attackOverlapsFighter(attack, target)) {
+      if (active && this.canAttackHit(attack, now) && this.attackOverlapsFighter(attack, target)) {
         target.receiveHit(owner, attack);
-        attack.hit = true;
+        this.registerAttackHit(attack, now);
         this.cameras.main.shake(attack.spec.button === 'special' ? 130 : 80, attack.spec.button === 'special' ? 0.007 : 0.004);
       }
 
-      if (now <= attack.expiresAt) {
+      if (now <= attack.expiresAt && !(attackType === 'projectile' && attack.hit)) {
         retainedAttacks.push(attack);
       } else {
         attack.rect.destroy();
@@ -193,6 +201,25 @@ export class GameScene extends Phaser.Scene {
     }
 
     this.attacks = retainedAttacks;
+  }
+
+  private canAttackHit(attack: AttackRuntime, now: number): boolean {
+    if (attack.spec.attackType !== 'multiHit') {
+      return !attack.hit;
+    }
+
+    return attack.hitsDone < (attack.spec.hitCount ?? 1) && now >= attack.nextHitAt;
+  }
+
+  private registerAttackHit(attack: AttackRuntime, now: number): void {
+    if (attack.spec.attackType !== 'multiHit') {
+      attack.hit = true;
+      return;
+    }
+
+    attack.hitsDone += 1;
+    attack.nextHitAt = now + (attack.spec.hitIntervalMs ?? 64);
+    attack.hit = attack.hitsDone >= (attack.spec.hitCount ?? 1);
   }
 
   private attackOverlapsFighter(attack: AttackRuntime, fighter: Fighter): boolean {

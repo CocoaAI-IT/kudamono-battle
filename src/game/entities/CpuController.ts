@@ -36,6 +36,28 @@ export class CpuController {
         this.specialPulseUntil = now + 90;
         this.attackMoveX = 0;
         this.attackMoveY = -1;
+      } else if (this.cpu.stats.characterKey === 'grape' && absoluteDistanceX > 190 && Math.abs(distanceY) < 120) {
+        this.drift = absoluteDistanceX > 420 ? (distanceX > 0 ? 1 : -1) : (distanceX > 0 ? -1 : 1);
+        this.attackMoveX = Math.sign(distanceX);
+        this.attackMoveY = 0;
+        this.specialPulseUntil = now + 105;
+      } else if (this.cpu.stats.characterKey === 'pineapple' && absoluteDistanceX < 240 && Math.abs(distanceY) < 110) {
+        this.drift = distanceX > 0 ? -1 : 1;
+        this.attackMoveX = 0;
+        this.attackMoveY = 1;
+        this.specialPulseUntil = now + 110;
+      } else if (this.cpu.stats.characterKey === 'watermelon' && absoluteDistanceX < 210 && Math.abs(distanceY) < 105) {
+        this.attackMoveX = Math.sign(distanceX);
+        this.attackMoveY = Phaser.Math.Between(0, 100) > 70 ? 0 : Math.sign(distanceY);
+        this.specialPulseUntil = now + 125;
+      } else if (this.cpu.stats.characterKey === 'cherry' && absoluteDistanceX < 220 && Math.abs(distanceY) < 120) {
+        this.attackMoveX = Math.sign(distanceX);
+        this.attackMoveY = Phaser.Math.Between(0, 100) > 55 ? 0 : Math.sign(distanceY);
+        if (absoluteDistanceX > 120 || Phaser.Math.Between(0, 100) > 62) {
+          this.specialPulseUntil = now + 95;
+        } else {
+          this.normalPulseUntil = now + 120;
+        }
       } else if (absoluteDistanceX < 86 && Math.abs(distanceY) < 82) {
         this.attackMoveX = Math.abs(distanceX) > 34 ? Math.sign(distanceX) : 0;
         this.attackMoveY = distanceY < -36 ? -1 : distanceY > 44 ? 1 : 0;

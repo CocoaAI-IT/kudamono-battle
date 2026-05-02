@@ -16,6 +16,8 @@ export class CharacterSelectScene extends Phaser.Scene {
   private visuals: CardVisual[] = [];
   private leftKey?: Phaser.Input.Keyboard.Key;
   private rightKey?: Phaser.Input.Keyboard.Key;
+  private upKey?: Phaser.Input.Keyboard.Key;
+  private downKey?: Phaser.Input.Keyboard.Key;
   private enterKey?: Phaser.Input.Keyboard.Key;
   private escKey?: Phaser.Input.Keyboard.Key;
 
@@ -37,15 +39,15 @@ export class CharacterSelectScene extends Phaser.Scene {
       color: '#fff7d6'
     });
 
-    this.add.text(72, 100, 'Player 1 selects a fighter. CPU uses the rival fruit for now.', {
+    this.add.text(72, 100, 'Player 1 selects a fighter. CPU counterpicks a rival fruit.', {
       fontFamily: 'Inter, Arial, sans-serif',
       fontSize: '20px',
       color: '#d8f4ff'
     });
 
     this.renderCards();
-    this.createButton(170, 640, 'TITLE', () => this.scene.start('TitleScene'));
-    this.createButton(1110, 640, 'NEXT', () => this.goNext(), 0x29b978);
+    this.createButton(170, 670, 'TITLE', () => this.scene.start('TitleScene'));
+    this.createButton(1110, 670, 'NEXT', () => this.goNext(), 0x29b978);
     this.bindKeys();
     this.refreshSelection();
   }
@@ -59,6 +61,14 @@ export class CharacterSelectScene extends Phaser.Scene {
       this.stepSelection(1);
     }
 
+    if (this.upKey && Phaser.Input.Keyboard.JustDown(this.upKey)) {
+      this.stepSelection(-3);
+    }
+
+    if (this.downKey && Phaser.Input.Keyboard.JustDown(this.downKey)) {
+      this.stepSelection(3);
+    }
+
     if (this.enterKey && Phaser.Input.Keyboard.JustDown(this.enterKey)) {
       this.goNext();
     }
@@ -69,14 +79,21 @@ export class CharacterSelectScene extends Phaser.Scene {
   }
 
   private renderCards(): void {
-    const cardWidth = 320;
-    const gap = 42;
-    const totalWidth = CHARACTER_SELECT_CARDS.length * cardWidth + (CHARACTER_SELECT_CARDS.length - 1) * gap;
+    const cardWidth = 342;
+    const cardHeight = 214;
+    const columns = 3;
+    const gapX = 34;
+    const gapY = 26;
+    const totalWidth = columns * cardWidth + (columns - 1) * gapX;
     const startX = GAME_WIDTH / 2 - totalWidth / 2 + cardWidth / 2;
+    const startY = 250;
 
     CHARACTER_SELECT_CARDS.forEach((card, index) => {
-      const x = startX + index * (cardWidth + gap);
-      this.createCard(card, x, 360, cardWidth, 390);
+      const column = index % columns;
+      const row = Math.floor(index / columns);
+      const x = startX + column * (cardWidth + gapX);
+      const y = startY + row * (cardHeight + gapY);
+      this.createCard(card, x, y, cardWidth, cardHeight);
     });
   }
 
@@ -89,35 +106,43 @@ export class CharacterSelectScene extends Phaser.Scene {
       this.refreshSelection();
     });
 
-    const portrait = this.add.image(x, y - 70, card.portraitTexture);
-    portrait.setDisplaySize(232, 232);
+    const portrait = this.add.image(x - width / 2 + 88, y - 8, card.portraitTexture);
+    portrait.setDisplaySize(132, 132);
     portrait.setInteractive({ useHandCursor: true });
     portrait.on('pointerdown', () => {
       this.selected = card.key;
       this.refreshSelection();
     });
 
-    this.add.text(x, y + 74, card.name, {
+    this.add.text(x + 62, y - 72, card.name, {
       fontFamily: 'Inter, Arial, sans-serif',
-      fontSize: '24px',
+      fontSize: '22px',
       fontStyle: '900',
       color: '#ffffff'
     }).setOrigin(0.5);
 
-    this.add.text(x, y + 112, card.role, {
+    this.add.text(x + 62, y - 38, card.role, {
       fontFamily: 'Inter, Arial, sans-serif',
-      fontSize: '17px',
+      fontSize: '16px',
       color: '#d8f4ff'
     }).setOrigin(0.5);
 
-    const trait = this.add.text(x, y + 158, card.trait, {
+    const trait = this.add.text(x + 62, y + 26, card.trait, {
       fontFamily: 'Inter, Arial, sans-serif',
       fontSize: '15px',
       color: '#f6e9c8',
       align: 'center',
-      wordWrap: { width: width - 48 }
+      wordWrap: { width: width - 178 }
     });
     trait.setOrigin(0.5);
+
+    this.add.text(x + 62, y + 82, card.weapon, {
+      fontFamily: 'Inter, Arial, sans-serif',
+      fontSize: '13px',
+      color: '#bfeaff',
+      align: 'center',
+      wordWrap: { width: width - 178 }
+    }).setOrigin(0.5);
 
     const marker = this.add.text(x, y - height / 2 + 28, 'P1', {
       fontFamily: 'Inter, Arial, sans-serif',
@@ -139,11 +164,13 @@ export class CharacterSelectScene extends Phaser.Scene {
 
     this.leftKey = keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
     this.rightKey = keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
+    this.upKey = keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
+    this.downKey = keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
     this.enterKey = keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
     this.escKey = keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
   }
 
-  private stepSelection(direction: -1 | 1): void {
+  private stepSelection(direction: number): void {
     const index = CHARACTER_SELECT_CARDS.findIndex((card) => card.key === this.selected);
     const nextIndex = Phaser.Math.Wrap(index + direction, 0, CHARACTER_SELECT_CARDS.length);
     this.selected = CHARACTER_SELECT_CARDS[nextIndex].key;
