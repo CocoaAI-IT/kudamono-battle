@@ -3,9 +3,10 @@ import { CPU_STATS, PLAYER_STATS } from '../data/fighters';
 import { DEATH_BOUNDS, GAME_HEIGHT, GAME_WIDTH, PLATFORMS } from '../data/stage';
 import { CpuController } from '../entities/CpuController';
 import { Fighter } from '../entities/Fighter';
+import { TouchControls } from '../input/TouchControls';
 import type { AttackRuntime, FighterIntent, ResultPayload } from '../types';
 
-type KeyboardMap = Record<'left' | 'right' | 'jump' | 'quick' | 'heavy' | 'dodge' | 'restart', Phaser.Input.Keyboard.Key>;
+type KeyboardMap = Record<'left' | 'right' | 'up' | 'down' | 'normal' | 'special' | 'dodge' | 'restart', Phaser.Input.Keyboard.Key>;
 
 export class GameScene extends Phaser.Scene {
   private player!: Fighter;
@@ -17,6 +18,7 @@ export class GameScene extends Phaser.Scene {
   private damageText!: Phaser.GameObjects.Text;
   private stockText!: Phaser.GameObjects.Text;
   private bannerText!: Phaser.GameObjects.Text;
+  private touchControls!: TouchControls;
   private ended = false;
 
   constructor() {
@@ -30,6 +32,7 @@ export class GameScene extends Phaser.Scene {
     this.createStage();
     this.createFighters();
     this.createInput();
+    this.touchControls = new TouchControls(this);
     this.createHud();
     this.cameras.main.setBounds(0, 0, GAME_WIDTH, GAME_HEIGHT);
   }
@@ -102,9 +105,10 @@ export class GameScene extends Phaser.Scene {
     this.keys = {
       left: keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A),
       right: keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D),
-      jump: keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W),
-      quick: keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.J),
-      heavy: keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.K),
+      up: keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W),
+      down: keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S),
+      normal: keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.J),
+      special: keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.K),
       dodge: keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.L),
       restart: keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R)
     };
@@ -126,7 +130,10 @@ export class GameScene extends Phaser.Scene {
     });
     this.damageText.setDepth(20);
 
-    this.bannerText = this.add.text(GAME_WIDTH / 2, 34, 'A/D move  W jump  J quick  K heavy  L dodge  R restart', {
+    const controlsText = this.touchControls.enabled
+      ? 'A attack  B special'
+      : 'A/D move  W jump/up  S down  J attack  K special  L dodge  R restart';
+    this.bannerText = this.add.text(GAME_WIDTH / 2, 34, controlsText, {
       fontFamily: 'Inter, Arial, sans-serif',
       fontSize: '18px',
       color: '#d7faff'
@@ -139,12 +146,16 @@ export class GameScene extends Phaser.Scene {
   }
 
   private readPlayerIntent(): FighterIntent {
+    const touch = this.touchControls.consumeState();
+    const keyboardX = Number(this.keys.right.isDown) - Number(this.keys.left.isDown);
+    const keyboardY = Number(this.keys.down.isDown) - Number(this.keys.up.isDown);
+
     return {
-      left: this.keys.left.isDown,
-      right: this.keys.right.isDown,
-      jump: this.keys.jump.isDown,
-      quickAttack: Phaser.Input.Keyboard.JustDown(this.keys.quick),
-      heavyAttack: Phaser.Input.Keyboard.JustDown(this.keys.heavy),
+      moveX: Phaser.Math.Clamp(touch.moveX || keyboardX, -1, 1),
+      moveY: Phaser.Math.Clamp(touch.moveY || keyboardY, -1, 1),
+      jump: this.keys.up.isDown || touch.jump,
+      normalAttack: Phaser.Input.Keyboard.JustDown(this.keys.normal) || touch.normalAttack,
+      specialAttack: Phaser.Input.Keyboard.JustDown(this.keys.special) || touch.specialAttack,
       dodge: Phaser.Input.Keyboard.JustDown(this.keys.dodge)
     };
   }
@@ -159,13 +170,13 @@ export class GameScene extends Phaser.Scene {
       const direction = owner.facing;
       const active = now >= attack.activeAt && now <= attack.expiresAt;
 
-      attack.rect.setPosition(owner.sprite.x + direction * (48 + attack.spec.reach / 2), owner.sprite.y - 8);
+      attack.rect.setPosition(owner.sprite.x + direction * attack.spec.offsetX, owner.sprite.y + attack.spec.offsetY);
       attack.rect.setVisible(active);
 
       if (active && !attack.hit && this.attackOverlapsFighter(attack, target)) {
         target.receiveHit(owner, attack);
         attack.hit = true;
-        this.cameras.main.shake(attack.kind === 'heavy' ? 130 : 80, attack.kind === 'heavy' ? 0.007 : 0.004);
+        this.cameras.main.shake(attack.spec.button === 'special' ? 130 : 80, attack.spec.button === 'special' ? 0.007 : 0.004);
       }
 
       if (now <= attack.expiresAt) {

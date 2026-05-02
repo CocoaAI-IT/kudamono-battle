@@ -1,5 +1,4 @@
 import Phaser from 'phaser';
-import { ATTACKS } from '../data/fighters';
 import { DEATH_BOUNDS, STAGE_CENTER } from '../data/stage';
 import type {
   AttackKind,
@@ -8,15 +7,16 @@ import type {
   FighterId,
   FighterIntent,
   FighterMotion,
-  FighterStats
+  FighterStats,
+  MoveDirection
 } from '../types';
 
 const EMPTY_INTENT: FighterIntent = {
-  left: false,
-  right: false,
+  moveX: 0,
+  moveY: 0,
   jump: false,
-  quickAttack: false,
-  heavyAttack: false,
+  normalAttack: false,
+  specialAttack: false,
   dodge: false
 };
 
@@ -39,7 +39,7 @@ export class Fighter {
   private jumpWasHeld = false;
   private attackEffect?: Phaser.GameObjects.Arc;
   private motion: FighterMotion = 'idle';
-  private attackMotion: AttackKind = 'quick';
+  private attackMotion: FighterMotion = 'quick';
   private hurtUntil = 0;
 
   constructor(scene: Phaser.Scene, stats: FighterStats) {
@@ -113,12 +113,12 @@ export class Fighter {
 
     this.jumpWasHeld = intent.jump;
 
-    if (intent.quickAttack && now >= this.attackLockedUntil && now >= this.stunUntil) {
-      return 'quick';
+    if (intent.normalAttack && now >= this.attackLockedUntil && now >= this.stunUntil) {
+      return `normal-${this.resolveMoveDirection(intent)}`;
     }
 
-    if (intent.heavyAttack && now >= this.attackLockedUntil && now >= this.stunUntil) {
-      return 'heavy';
+    if (intent.specialAttack && now >= this.attackLockedUntil && now >= this.stunUntil) {
+      return `special-${this.resolveMoveDirection(intent)}`;
     }
 
     if (this.isInvincible) {
@@ -143,21 +143,30 @@ export class Fighter {
 
   startAttack(kind: AttackKind): AttackRuntime {
     const now = this.scene.time.now;
-    const spec = ATTACKS[kind];
+    const spec = this.stats.moves[kind];
     this.attackLockedUntil = now + spec.windupMs + spec.activeMs + spec.recoveryMs;
     this.stunUntil = Math.max(this.stunUntil, now + spec.selfFreezeMs);
-    this.attackMotion = kind;
-    this.setMotion(kind);
+    this.attackMotion = spec.motion;
+    this.setMotion(spec.motion);
 
-    const x = this.sprite.x + this.facing * (48 + spec.reach / 2);
-    const y = this.sprite.y - 8;
-    const color = kind === 'quick' ? this.stats.tint : this.stats.accent;
+    if (spec.selfVelocityX) {
+      this.sprite.setVelocityX(this.facing * spec.selfVelocityX);
+    }
+
+    if (spec.selfVelocityY) {
+      this.sprite.setVelocityY(spec.selfVelocityY);
+      this.canDoubleJump = false;
+    }
+
+    const x = this.sprite.x + this.facing * spec.offsetX;
+    const y = this.sprite.y + spec.offsetY;
+    const color = spec.button === 'normal' ? this.stats.tint : this.stats.accent;
     const rect = this.scene.add.rectangle(x, y, spec.reach, spec.height, color, 0.18);
     rect.setStrokeStyle(2, color, 0.75);
     rect.setDepth(12);
     rect.setVisible(false);
 
-    this.showAttackArc(kind, color);
+    this.showAttackArc(spec.motion, color);
 
     return {
       ownerId: this.id,
@@ -179,13 +188,14 @@ export class Fighter {
     const now = this.scene.time.now;
     const launchDirection: Facing = source.sprite.x <= this.sprite.x ? 1 : -1;
     const knockback = (attack.spec.baseKnockback + this.damage * attack.spec.knockbackGrowth) / this.stats.weight;
+    const launchY = (attack.spec.launchY + this.damage * attack.spec.launchYGrowth) / this.stats.weight;
     this.damage = Math.min(999, this.damage + attack.spec.damage);
     this.stunUntil = now + 180 + this.damage * 2.1;
     this.invincibleUntil = now + 260;
     this.hurtUntil = now + 360;
-    this.sprite.setVelocity(launchDirection * knockback, -attack.spec.upwardForce - this.damage * 1.45);
+    this.sprite.setVelocity(launchDirection * knockback, launchY);
     this.setMotion('hurt');
-    this.flash(attack.kind === 'heavy' ? 0xffffff : source.stats.accent);
+    this.flash(attack.spec.button === 'special' ? 0xffffff : source.stats.accent);
   }
 
   wantsRecovery(): boolean {
@@ -217,10 +227,10 @@ export class Fighter {
 
   private applyHorizontalMovement(intent: FighterIntent, grounded: boolean): void {
     const body = this.sprite.body as Phaser.Physics.Arcade.Body;
-    const axis = Number(intent.right) - Number(intent.left);
+    const axis = Phaser.Math.Clamp(intent.moveX, -1, 1);
     const control = grounded ? 1 : this.stats.airControl;
 
-    if (axis !== 0) {
+    if (Math.abs(axis) > 0.12) {
       body.setVelocityX(axis * this.stats.speed * control);
       this.facing = axis > 0 ? 1 : -1;
       this.sprite.setFlipX(this.facing === -1);
@@ -266,9 +276,9 @@ export class Fighter {
     this.emitDodgeAfterimage();
   }
 
-  private showAttackArc(kind: AttackKind, color: number): void {
+  private showAttackArc(motion: FighterMotion, color: number): void {
     this.attackEffect?.destroy();
-    const radius = kind === 'quick' ? 62 : 84;
+    const radius = motion === 'quick' ? 62 : 84;
     this.attackEffect = this.scene.add.arc(
       this.sprite.x + this.facing * 42,
       this.sprite.y - 6,
@@ -277,15 +287,15 @@ export class Fighter {
       this.facing === 1 ? 58 : 238,
       false,
       color,
-      kind === 'quick' ? 0.26 : 0.36
+      motion === 'quick' ? 0.26 : 0.36
     );
-    this.attackEffect.setStrokeStyle(kind === 'quick' ? 8 : 12, color, 0.82);
+    this.attackEffect.setStrokeStyle(motion === 'quick' ? 8 : 12, color, 0.82);
     this.attackEffect.setDepth(11);
     this.scene.tweens.add({
       targets: this.attackEffect,
       alpha: 0,
       scale: 1.18,
-      duration: kind === 'quick' ? 140 : 210,
+      duration: motion === 'quick' ? 140 : 210,
       onComplete: () => this.attackEffect?.destroy()
     });
   }
@@ -357,5 +367,24 @@ export class Fighter {
     this.motion = motion;
     this.sprite.setTexture(this.stats.textures[motion]);
     this.sprite.setDisplaySize(126, 157);
+  }
+
+  private resolveMoveDirection(intent: FighterIntent): MoveDirection {
+    const x = Phaser.Math.Clamp(intent.moveX, -1, 1);
+    const y = Phaser.Math.Clamp(intent.moveY, -1, 1);
+    const absX = Math.abs(x);
+    const absY = Math.abs(y);
+
+    if (absY > 0.55 && absY >= absX * 0.85) {
+      return y < 0 ? 'up' : 'down';
+    }
+
+    if (absX > 0.35) {
+      this.facing = x > 0 ? 1 : -1;
+      this.sprite.setFlipX(this.facing === -1);
+      return 'side';
+    }
+
+    return 'neutral';
   }
 }

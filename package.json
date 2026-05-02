@@ -1,5 +1,5 @@
 {
-  "name": "smabura",
+  "name": "kudamono-battle",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "build:pages": "tsc && vite build --base=/smabura/",
+    "build:pages": "tsc && vite build --base=/kudamono-battle/",
     "preview": "vite preview",
     "deploy": "bun run build:pages && gh-pages -d dist"
   },

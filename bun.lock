@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "smabura",
+      "name": "kudamono-battle",
       "dependencies": {
         "phaser": "^3.90.0",
       },
