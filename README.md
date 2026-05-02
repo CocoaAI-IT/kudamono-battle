@@ -11,6 +11,16 @@ bun run dev
 
 Open `http://127.0.0.1:5173/`.
 
+## Flow
+
+`Title -> Character Select -> Stage Select -> Game -> Result`
+
+From the result screen:
+
+- `R`: rematch with the same character and stage
+- `C`: return to character select
+- `T`: return to title
+
 ## Controls
 
 - `A` / `D`: move
@@ -59,6 +69,7 @@ Banana Brawler:
 ## Docs
 
 - [Character and visual design](docs/character-design.md)
+- [Screen flow and menus](docs/screen-flow.md)
 
 ## Build and Deploy
 

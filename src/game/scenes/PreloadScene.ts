@@ -6,7 +6,10 @@ export class PreloadScene extends Phaser.Scene {
   }
 
   preload(): void {
-    this.load.image('background', 'assets/kitchen-stage.webp');
+    this.load.image('title-key-art', 'assets/ui/title-key-art.webp');
+    this.load.image('portrait-strawberry', 'assets/ui/portrait-strawberry-samurai.webp');
+    this.load.image('portrait-banana', 'assets/ui/portrait-banana-brawler.webp');
+    this.load.image('background-kitchen', 'assets/kitchen-stage.webp');
     const motions = ['idle', 'run', 'jump', 'quick', 'heavy', 'hurt'];
 
     for (const motion of motions) {
@@ -16,6 +19,6 @@ export class PreloadScene extends Phaser.Scene {
   }
 
   create(): void {
-    this.scene.start('GameScene');
+    this.scene.start('TitleScene');
   }
 }

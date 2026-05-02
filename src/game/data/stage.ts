@@ -1,3 +1,6 @@
+import Phaser from 'phaser';
+import type { StageKey, StageSelectCard } from '../types';
+
 export const GAME_WIDTH = 1280;
 export const GAME_HEIGHT = 720;
 
@@ -8,28 +11,52 @@ export const DEATH_BOUNDS = {
   bottom: GAME_HEIGHT + 190
 };
 
-export const STAGE_CENTER = { x: GAME_WIDTH / 2, y: 500 };
-
-export const PLATFORMS = [
-  {
-    id: 'cutting-board',
-    x: 640,
-    y: 520,
-    width: 1030,
-    height: 42
-  },
-  {
-    id: 'left-plate',
-    x: 328,
-    y: 398,
-    width: 252,
-    height: 24
-  },
-  {
-    id: 'right-plate',
-    x: 952,
-    y: 398,
-    width: 260,
-    height: 24
+export const STAGES = {
+  kitchen: {
+    key: 'kitchen',
+    name: 'Kitchen Counter',
+    subtitle: 'Cutting Board Clash',
+    description: 'A warm countertop arena with a wide cutting board and two plate platforms.',
+    backgroundTexture: 'background-kitchen',
+    previewTexture: 'background-kitchen',
+    center: { x: GAME_WIDTH / 2, y: 500 },
+    playerSpawn: new Phaser.Math.Vector2(430, 378),
+    cpuSpawn: new Phaser.Math.Vector2(850, 378),
+    platforms: [
+      {
+        id: 'cutting-board',
+        x: 640,
+        y: 520,
+        width: 1030,
+        height: 42
+      },
+      {
+        id: 'left-plate',
+        x: 328,
+        y: 398,
+        width: 252,
+        height: 24
+      },
+      {
+        id: 'right-plate',
+        x: 952,
+        y: 398,
+        width: 260,
+        height: 24
+      }
+    ]
   }
-] as const;
+} as const;
+
+export const STAGE_KEYS: StageKey[] = ['kitchen'];
+
+export const STAGE_SELECT_CARDS: StageSelectCard[] = STAGE_KEYS.map((key) => ({
+  key,
+  name: STAGES[key].name,
+  subtitle: STAGES[key].subtitle,
+  description: STAGES[key].description,
+  previewTexture: STAGES[key].previewTexture
+}));
+
+export const STAGE_CENTER = STAGES.kitchen.center;
+export const PLATFORMS = STAGES.kitchen.platforms;

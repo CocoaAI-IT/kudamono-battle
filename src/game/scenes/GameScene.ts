@@ -1,10 +1,11 @@
 import Phaser from 'phaser';
-import { CPU_STATS, PLAYER_STATS } from '../data/fighters';
-import { DEATH_BOUNDS, GAME_HEIGHT, GAME_WIDTH, PLATFORMS } from '../data/stage';
+import { createFighterStats } from '../data/fighters';
+import { DEFAULT_MATCH_CONFIG } from '../data/match';
+import { DEATH_BOUNDS, GAME_HEIGHT, GAME_WIDTH, STAGES } from '../data/stage';
 import { CpuController } from '../entities/CpuController';
 import { Fighter } from '../entities/Fighter';
 import { TouchControls } from '../input/TouchControls';
-import type { AttackRuntime, FighterIntent, ResultPayload } from '../types';
+import type { AttackRuntime, FighterIntent, MatchConfig, ResultPayload } from '../types';
 
 type KeyboardMap = Record<'left' | 'right' | 'up' | 'down' | 'normal' | 'special' | 'dodge' | 'restart', Phaser.Input.Keyboard.Key>;
 
@@ -19,16 +20,19 @@ export class GameScene extends Phaser.Scene {
   private stockText!: Phaser.GameObjects.Text;
   private bannerText!: Phaser.GameObjects.Text;
   private touchControls!: TouchControls;
+  private matchConfig: MatchConfig = DEFAULT_MATCH_CONFIG;
   private ended = false;
 
   constructor() {
     super('GameScene');
   }
 
-  create(): void {
+  create(config: MatchConfig = DEFAULT_MATCH_CONFIG): void {
+    this.matchConfig = config;
+    const stage = STAGES[this.matchConfig.stage];
     this.ended = false;
     this.attacks = [];
-    this.add.image(GAME_WIDTH / 2, GAME_HEIGHT / 2, 'background').setDepth(0);
+    this.add.image(GAME_WIDTH / 2, GAME_HEIGHT / 2, stage.backgroundTexture).setDepth(0);
     this.createStage();
     this.createFighters();
     this.createInput();
@@ -65,8 +69,9 @@ export class GameScene extends Phaser.Scene {
 
   private createStage(): void {
     this.platforms = this.physics.add.staticGroup();
+    const stage = STAGES[this.matchConfig.stage];
 
-    for (const platformDef of PLATFORMS) {
+    for (const platformDef of stage.platforms) {
       const collider = this.add.zone(platformDef.x, platformDef.y, platformDef.width, platformDef.height);
       this.physics.add.existing(collider, true);
       const body = collider.body as Phaser.Physics.Arcade.StaticBody;
@@ -80,8 +85,9 @@ export class GameScene extends Phaser.Scene {
   }
 
   private createFighters(): void {
-    this.player = new Fighter(this, PLAYER_STATS);
-    this.cpu = new Fighter(this, CPU_STATS);
+    const stage = STAGES[this.matchConfig.stage];
+    this.player = new Fighter(this, createFighterStats(this.matchConfig.playerCharacter, 'player', stage.playerSpawn));
+    this.cpu = new Fighter(this, createFighterStats(this.matchConfig.cpuCharacter, 'cpu', stage.cpuSpawn));
     this.player.resetForMatch();
     this.cpu.resetForMatch();
     this.cpuController = new CpuController(this, this.cpu, this.player);
@@ -222,7 +228,8 @@ export class GameScene extends Phaser.Scene {
     const payload: ResultPayload = {
       winner: this.player.stocks === this.cpu.stocks ? 'draw' : this.player.stocks > this.cpu.stocks ? 'player' : 'cpu',
       playerDamage: this.player.damage,
-      cpuDamage: this.cpu.damage
+      cpuDamage: this.cpu.damage,
+      config: this.matchConfig
     };
 
     this.time.delayedCall(540, () => {

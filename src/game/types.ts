@@ -1,5 +1,9 @@
 export type FighterId = 'player' | 'cpu';
 
+export type CharacterKey = 'strawberry' | 'banana';
+
+export type StageKey = 'kitchen';
+
 export type Facing = -1 | 1;
 
 export type MoveDirection = 'neutral' | 'side' | 'up' | 'down';
@@ -21,6 +25,7 @@ export type FighterIntent = {
 
 export type FighterStats = {
   id: FighterId;
+  characterKey: CharacterKey;
   name: string;
   shortName: string;
   textures: Record<FighterMotion, string>;
@@ -32,6 +37,32 @@ export type FighterStats = {
   airControl: number;
   weight: number;
   moves: Record<AttackKind, AttackSpec>;
+};
+
+export type CharacterSelectCard = {
+  key: CharacterKey;
+  name: string;
+  shortName: string;
+  role: string;
+  trait: string;
+  weapon: string;
+  portraitTexture: string;
+  tint: number;
+  accent: number;
+};
+
+export type StageSelectCard = {
+  key: StageKey;
+  name: string;
+  subtitle: string;
+  description: string;
+  previewTexture: string;
+};
+
+export type MatchConfig = {
+  playerCharacter: CharacterKey;
+  cpuCharacter: CharacterKey;
+  stage: StageKey;
 };
 
 export type AttackSpec = {
@@ -74,4 +105,5 @@ export type ResultPayload = {
   winner: MatchWinner;
   playerDamage: number;
   cpuDamage: number;
+  config: MatchConfig;
 };

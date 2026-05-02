@@ -1,8 +1,11 @@
 import Phaser from 'phaser';
 import './styles.css';
+import { CharacterSelectScene } from './game/scenes/CharacterSelectScene';
 import { GameScene } from './game/scenes/GameScene';
 import { PreloadScene } from './game/scenes/PreloadScene';
 import { ResultScene } from './game/scenes/ResultScene';
+import { StageSelectScene } from './game/scenes/StageSelectScene';
+import { TitleScene } from './game/scenes/TitleScene';
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -21,7 +24,7 @@ const config: Phaser.Types.Core.GameConfig = {
       debug: false
     }
   },
-  scene: [PreloadScene, GameScene, ResultScene]
+  scene: [PreloadScene, TitleScene, CharacterSelectScene, StageSelectScene, GameScene, ResultScene]
 };
 
 new Phaser.Game(config);
