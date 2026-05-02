@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" role="img" aria-label="Astra Ronin character">
+  <defs>
+    <linearGradient id="coat" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1f375d"/>
+      <stop offset="0.52" stop-color="#11213b"/>
+      <stop offset="1" stop-color="#091324"/>
+    </linearGradient>
+    <linearGradient id="blade" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fef9b7"/>
+      <stop offset="0.45" stop-color="#7cf4ff"/>
+      <stop offset="1" stop-color="#166a86"/>
+    </linearGradient>
+    <filter id="glow" x="-45%" y="-45%" width="190%" height="190%">
+      <feGaussianBlur stdDeviation="3.4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <ellipse cx="96" cy="170" rx="44" ry="12" fill="#06101f" opacity="0.35"/>
+  <path d="M70 73c4-28 17-44 37-44 19 0 32 16 34 44l-10 28H80z" fill="#162b4e" stroke="#7cf4ff" stroke-width="5"/>
+  <path d="M82 45c17-16 45-12 55 9-13-5-31-3-49 8z" fill="#101a2f"/>
+  <path d="M70 88c-19 18-29 44-28 73h28l18-51z" fill="url(#coat)" stroke="#7cf4ff" stroke-width="4"/>
+  <path d="M122 87c20 19 29 45 28 74h-28l-18-51z" fill="url(#coat)" stroke="#7cf4ff" stroke-width="4"/>
+  <path d="M74 82h44c15 20 18 52 11 88H62c-6-36-3-68 12-88z" fill="url(#coat)" stroke="#d8fdff" stroke-width="4"/>
+  <path d="M92 86h21l-4 78H80z" fill="#f8d86b" opacity="0.86"/>
+  <path d="M72 66h50l-8 28H80z" fill="#efd1b3"/>
+  <path d="M81 70h35l-4 10H85z" fill="#0a1424"/>
+  <path d="M86 74h10M105 74h10" stroke="#7cf4ff" stroke-width="4" stroke-linecap="round" filter="url(#glow)"/>
+  <path d="M133 74l36-44 8 8-36 45z" fill="url(#blade)" filter="url(#glow)"/>
+  <path d="M124 85l16-18 13 13-17 17z" fill="#f7db6e" stroke="#221a29" stroke-width="3"/>
+  <path d="M78 167v-34M118 167v-34" stroke="#101626" stroke-width="16" stroke-linecap="round"/>
+  <path d="M69 170h28M107 170h28" stroke="#7cf4ff" stroke-width="8" stroke-linecap="round"/>
+</svg>
