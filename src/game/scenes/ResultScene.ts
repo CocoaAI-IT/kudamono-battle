@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { getCharacterSelectCard } from '../data/fighters';
-import { DEFAULT_MATCH_CONFIG } from '../data/match';
+import { DEFAULT_MATCH_CONFIG, normalizeMatchConfig } from '../data/match';
 import { GAME_HEIGHT, GAME_WIDTH, STAGES } from '../data/stage';
 import type { ResultPayload } from '../types';
 
@@ -19,15 +19,20 @@ export class ResultScene extends Phaser.Scene {
     super('ResultScene');
   }
 
-  create(payload: ResultPayload): void {
-    this.payload = payload;
-    const stage = STAGES[payload.config.stage];
+  create(payload: Partial<ResultPayload> = this.payload): void {
+    this.payload = {
+      winner: payload.winner ?? 'draw',
+      playerDamage: payload.playerDamage ?? 0,
+      cpuDamage: payload.cpuDamage ?? 0,
+      config: normalizeMatchConfig(payload?.config)
+    };
+    const stage = STAGES[this.payload.config.stage];
     this.add.image(GAME_WIDTH / 2, GAME_HEIGHT / 2, stage.backgroundTexture).setAlpha(0.7);
     this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x06101f, 0.5);
 
-    const playerCard = getCharacterSelectCard(payload.config.playerCharacter);
-    const cpuCard = getCharacterSelectCard(payload.config.cpuCharacter);
-    const winnerCard = payload.winner === 'player' ? playerCard : payload.winner === 'cpu' ? cpuCard : undefined;
+    const playerCard = getCharacterSelectCard(this.payload.config.playerCharacter);
+    const cpuCard = getCharacterSelectCard(this.payload.config.cpuCharacter);
+    const winnerCard = this.payload.winner === 'player' ? playerCard : this.payload.winner === 'cpu' ? cpuCard : undefined;
     const title = winnerCard ? `${winnerCard.shortName} WINS` : 'DRAW';
     const color = winnerCard ? `#${winnerCard.accent.toString(16).padStart(6, '0')}` : '#f4f7ff';
 
@@ -41,7 +46,7 @@ export class ResultScene extends Phaser.Scene {
     this.add.text(
       GAME_WIDTH / 2,
       338,
-      `Final damage  1P ${Math.round(payload.playerDamage)}%   CPU ${Math.round(payload.cpuDamage)}%`,
+      `Final damage  1P ${Math.round(this.payload.playerDamage)}%   CPU ${Math.round(this.payload.cpuDamage)}%`,
       {
         fontFamily: 'Inter, Arial, sans-serif',
         fontSize: '24px',

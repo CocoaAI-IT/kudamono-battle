@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { createFighterStats } from '../data/fighters';
-import { DEFAULT_MATCH_CONFIG } from '../data/match';
+import { DEFAULT_MATCH_CONFIG, normalizeMatchConfig } from '../data/match';
 import { DEATH_BOUNDS, GAME_HEIGHT, GAME_WIDTH, STAGES } from '../data/stage';
 import { CpuController } from '../entities/CpuController';
 import { Fighter } from '../entities/Fighter';
@@ -27,8 +27,8 @@ export class GameScene extends Phaser.Scene {
     super('GameScene');
   }
 
-  create(config: MatchConfig = DEFAULT_MATCH_CONFIG): void {
-    this.matchConfig = config;
+  create(config: Partial<MatchConfig> = DEFAULT_MATCH_CONFIG): void {
+    this.matchConfig = normalizeMatchConfig(config);
     const stage = STAGES[this.matchConfig.stage];
     this.ended = false;
     this.attacks = [];
@@ -43,7 +43,7 @@ export class GameScene extends Phaser.Scene {
 
   update(): void {
     if (Phaser.Input.Keyboard.JustDown(this.keys.restart)) {
-      this.scene.restart();
+      this.scene.restart(this.matchConfig);
       return;
     }
 

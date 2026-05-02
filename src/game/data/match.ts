@@ -1,5 +1,6 @@
-import type { MatchConfig } from '../types';
+import type { CharacterKey, MatchConfig, StageKey } from '../types';
 import { CHARACTER_KEYS } from './fighters';
+import { STAGE_KEYS } from './stage';
 
 export const DEFAULT_MATCH_CONFIG: MatchConfig = {
   playerCharacter: 'strawberry',
@@ -24,4 +25,28 @@ export function getCpuCharacterFor(playerCharacter: MatchConfig['playerCharacter
   }
 
   return CHARACTER_KEYS.find((character) => character !== playerCharacter) ?? 'banana';
+}
+
+export function normalizeMatchConfig(config: Partial<MatchConfig> = {}): MatchConfig {
+  const playerCharacter = isCharacterKey(config.playerCharacter)
+    ? config.playerCharacter
+    : DEFAULT_MATCH_CONFIG.playerCharacter;
+  const cpuCharacter = isCharacterKey(config.cpuCharacter) && config.cpuCharacter !== playerCharacter
+    ? config.cpuCharacter
+    : getCpuCharacterFor(playerCharacter);
+  const stage = isStageKey(config.stage) ? config.stage : DEFAULT_MATCH_CONFIG.stage;
+
+  return {
+    playerCharacter,
+    cpuCharacter,
+    stage
+  };
+}
+
+function isCharacterKey(value: unknown): value is CharacterKey {
+  return typeof value === 'string' && (CHARACTER_KEYS as readonly string[]).includes(value);
+}
+
+function isStageKey(value: unknown): value is StageKey {
+  return typeof value === 'string' && (STAGE_KEYS as readonly string[]).includes(value);
 }

@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { DEFAULT_MATCH_CONFIG } from '../data/match';
+import { DEFAULT_MATCH_CONFIG, normalizeMatchConfig } from '../data/match';
 import { GAME_HEIGHT, GAME_WIDTH, STAGE_SELECT_CARDS } from '../data/stage';
 import type { MatchConfig, StageKey, StageSelectCard } from '../types';
 
@@ -22,9 +22,9 @@ export class StageSelectScene extends Phaser.Scene {
     super('StageSelectScene');
   }
 
-  create(config: MatchConfig = DEFAULT_MATCH_CONFIG): void {
-    this.config = config;
-    this.selected = config.stage;
+  create(config: Partial<MatchConfig> = DEFAULT_MATCH_CONFIG): void {
+    this.config = normalizeMatchConfig(config);
+    this.selected = this.config.stage;
     this.visuals = [];
     this.add.image(GAME_WIDTH / 2, GAME_HEIGHT / 2, 'title-key-art').setDepth(0).setAlpha(0.68);
     this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x07101d, 0.58);

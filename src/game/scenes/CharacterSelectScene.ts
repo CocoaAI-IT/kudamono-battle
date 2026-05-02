@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { CHARACTER_SELECT_CARDS } from '../data/fighters';
-import { DEFAULT_MATCH_CONFIG, getCpuCharacterFor } from '../data/match';
+import { DEFAULT_MATCH_CONFIG, getCpuCharacterFor, normalizeMatchConfig } from '../data/match';
 import { GAME_HEIGHT, GAME_WIDTH } from '../data/stage';
 import type { CharacterKey, CharacterSelectCard, MatchConfig } from '../types';
 
@@ -25,9 +25,9 @@ export class CharacterSelectScene extends Phaser.Scene {
     super('CharacterSelectScene');
   }
 
-  create(config: MatchConfig = DEFAULT_MATCH_CONFIG): void {
-    this.config = config;
-    this.selected = config.playerCharacter;
+  create(config: Partial<MatchConfig> = DEFAULT_MATCH_CONFIG): void {
+    this.config = normalizeMatchConfig(config);
+    this.selected = this.config.playerCharacter;
     this.visuals = [];
     this.add.image(GAME_WIDTH / 2, GAME_HEIGHT / 2, 'background-kitchen').setDepth(0).setAlpha(0.74);
     this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x07101d, 0.48);
