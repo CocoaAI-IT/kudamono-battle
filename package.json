@@ -3,15 +3,19 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
+  "packageManager": "bun@1.3.13",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "build:pages": "tsc && vite build --base=/smabura/",
+    "preview": "vite preview",
+    "deploy": "bun run build:pages && gh-pages -d dist"
   },
   "dependencies": {
     "phaser": "^3.90.0"
   },
   "devDependencies": {
+    "gh-pages": "^6.3.0",
     "typescript": "^5.9.3",
     "vite": "^7.1.12"
   }

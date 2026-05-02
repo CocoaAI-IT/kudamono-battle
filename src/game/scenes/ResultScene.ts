@@ -13,7 +13,7 @@ export class ResultScene extends Phaser.Scene {
     this.add.image(GAME_WIDTH / 2, GAME_HEIGHT / 2, 'background').setAlpha(0.7);
     this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x06101f, 0.5);
 
-    const title = payload.winner === 'player' ? 'ASTRA WINS' : payload.winner === 'cpu' ? 'VOLT WINS' : 'DRAW';
+    const title = payload.winner === 'player' ? 'BERRY WINS' : payload.winner === 'cpu' ? 'NANA WINS' : 'DRAW';
     const color = payload.winner === 'player' ? '#83f7ff' : payload.winner === 'cpu' ? '#ff91b1' : '#f4f7ff';
 
     this.add.text(GAME_WIDTH / 2, 245, title, {

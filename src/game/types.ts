@@ -4,6 +4,8 @@ export type Facing = -1 | 1;
 
 export type AttackKind = 'quick' | 'heavy';
 
+export type FighterMotion = 'idle' | 'run' | 'jump' | 'quick' | 'heavy' | 'hurt';
+
 export type FighterIntent = {
   left: boolean;
   right: boolean;
@@ -16,7 +18,8 @@ export type FighterIntent = {
 export type FighterStats = {
   id: FighterId;
   name: string;
-  texture: string;
+  shortName: string;
+  textures: Record<FighterMotion, string>;
   spawn: Phaser.Math.Vector2;
   tint: number;
   accent: number;

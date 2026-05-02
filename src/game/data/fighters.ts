@@ -3,11 +3,19 @@ import type { AttackKind, AttackSpec, FighterStats } from '../types';
 
 export const PLAYER_STATS: FighterStats = {
   id: 'player',
-  name: 'Astra Ronin',
-  texture: 'player',
+  name: 'Strawberry Samurai',
+  shortName: 'BERRY',
+  textures: {
+    idle: 'strawberry-idle',
+    run: 'strawberry-run',
+    jump: 'strawberry-jump',
+    quick: 'strawberry-quick',
+    heavy: 'strawberry-heavy',
+    hurt: 'strawberry-hurt'
+  },
   spawn: new Phaser.Math.Vector2(430, 378),
-  tint: 0x7cf4ff,
-  accent: 0xffdf6e,
+  tint: 0xff5b69,
+  accent: 0x29f2f2,
   speed: 410,
   jumpVelocity: 650,
   airControl: 0.58,
@@ -16,11 +24,19 @@ export const PLAYER_STATS: FighterStats = {
 
 export const CPU_STATS: FighterStats = {
   id: 'cpu',
-  name: 'Volt Kensei',
-  texture: 'cpu',
+  name: 'Banana Brawler',
+  shortName: 'NANA',
+  textures: {
+    idle: 'banana-idle',
+    run: 'banana-run',
+    jump: 'banana-jump',
+    quick: 'banana-quick',
+    heavy: 'banana-heavy',
+    hurt: 'banana-hurt'
+  },
   spawn: new Phaser.Math.Vector2(850, 378),
-  tint: 0xff7197,
-  accent: 0x8dffb6,
+  tint: 0xffde4d,
+  accent: 0xa8ff3e,
   speed: 380,
   jumpVelocity: 620,
   airControl: 0.52,

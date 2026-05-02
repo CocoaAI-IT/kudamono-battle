@@ -7,6 +7,7 @@ import type {
   Facing,
   FighterId,
   FighterIntent,
+  FighterMotion,
   FighterStats
 } from '../types';
 
@@ -37,13 +38,16 @@ export class Fighter {
   private readonly scene: Phaser.Scene;
   private jumpWasHeld = false;
   private attackEffect?: Phaser.GameObjects.Arc;
+  private motion: FighterMotion = 'idle';
+  private attackMotion: AttackKind = 'quick';
+  private hurtUntil = 0;
 
   constructor(scene: Phaser.Scene, stats: FighterStats) {
     this.scene = scene;
     this.id = stats.id;
     this.stats = stats;
-    this.sprite = scene.physics.add.sprite(stats.spawn.x, stats.spawn.y, stats.texture);
-    this.sprite.setDisplaySize(86, 112);
+    this.sprite = scene.physics.add.sprite(stats.spawn.x, stats.spawn.y, stats.textures.idle);
+    this.sprite.setDisplaySize(126, 157);
     this.sprite.setDragX(1800);
     this.sprite.setMaxVelocity(760, 980);
     this.sprite.setDepth(8);
@@ -51,8 +55,8 @@ export class Fighter {
     this.sprite.setCollideWorldBounds(false);
 
     const body = this.sprite.body as Phaser.Physics.Arcade.Body;
-    body.setSize(76, 122);
-    body.setOffset(58, 64);
+    body.setSize(206, 336);
+    body.setOffset(68, 72);
   }
 
   get isGrounded(): boolean {
@@ -78,10 +82,13 @@ export class Fighter {
     this.attackLockedUntil = 0;
     this.dodgeCooldownUntil = 0;
     this.respawning = false;
+    this.hurtUntil = 0;
+    this.attackMotion = 'quick';
     this.sprite.enableBody(true, this.stats.spawn.x, this.stats.spawn.y, true, true);
     this.sprite.setVelocity(0, 0);
     this.sprite.setAlpha(1);
     this.sprite.setFlipX(this.facing === -1);
+    this.setMotion('idle');
   }
 
   update(intent: FighterIntent = EMPTY_INTENT): AttackKind | undefined {
@@ -129,6 +136,8 @@ export class Fighter {
       this.sprite.setFlipX(this.facing === -1);
     }
 
+    this.updateMotion(grounded, body.velocity.x, now);
+
     return undefined;
   }
 
@@ -137,6 +146,8 @@ export class Fighter {
     const spec = ATTACKS[kind];
     this.attackLockedUntil = now + spec.windupMs + spec.activeMs + spec.recoveryMs;
     this.stunUntil = Math.max(this.stunUntil, now + spec.selfFreezeMs);
+    this.attackMotion = kind;
+    this.setMotion(kind);
 
     const x = this.sprite.x + this.facing * (48 + spec.reach / 2);
     const y = this.sprite.y - 8;
@@ -171,7 +182,9 @@ export class Fighter {
     this.damage = Math.min(999, this.damage + attack.spec.damage);
     this.stunUntil = now + 180 + this.damage * 2.1;
     this.invincibleUntil = now + 260;
+    this.hurtUntil = now + 360;
     this.sprite.setVelocity(launchDirection * knockback, -attack.spec.upwardForce - this.damage * 1.45);
+    this.setMotion('hurt');
     this.flash(attack.kind === 'heavy' ? 0xffffff : source.stats.accent);
   }
 
@@ -290,8 +303,8 @@ export class Fighter {
   }
 
   private emitDodgeAfterimage(): void {
-    const afterimage = this.scene.add.image(this.sprite.x, this.sprite.y, this.stats.texture);
-    afterimage.setDisplaySize(86, 112);
+    const afterimage = this.scene.add.image(this.sprite.x, this.sprite.y, this.sprite.texture.key);
+    afterimage.setDisplaySize(126, 157);
     afterimage.setFlipX(this.sprite.flipX);
     afterimage.setTint(this.stats.tint);
     afterimage.setAlpha(0.38);
@@ -310,5 +323,39 @@ export class Fighter {
     this.scene.time.delayedCall(80, () => {
       this.sprite.clearTint();
     });
+  }
+
+  private updateMotion(grounded: boolean, velocityX: number, now: number): void {
+    if (now < this.hurtUntil) {
+      this.setMotion('hurt');
+      return;
+    }
+
+    if (now < this.attackLockedUntil) {
+      this.setMotion(this.attackMotion);
+      return;
+    }
+
+    if (!grounded) {
+      this.setMotion('jump');
+      return;
+    }
+
+    if (Math.abs(velocityX) > 34) {
+      this.setMotion('run');
+      return;
+    }
+
+    this.setMotion('idle');
+  }
+
+  private setMotion(motion: FighterMotion): void {
+    if (this.motion === motion) {
+      return;
+    }
+
+    this.motion = motion;
+    this.sprite.setTexture(this.stats.textures[motion]);
+    this.sprite.setDisplaySize(126, 157);
   }
 }

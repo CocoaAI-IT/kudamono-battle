@@ -5,8 +5,8 @@ A browser-based 2D platform fighter prototype built with Vite, TypeScript, and P
 ## Run
 
 ```bash
-npm install
-npm run dev
+bun install
+bun run dev
 ```
 
 Open `http://127.0.0.1:5173/`.
@@ -22,8 +22,18 @@ Open `http://127.0.0.1:5173/`.
 
 ## Current Scope
 
+- Bun-based build and deployment scripts
 - 1P vs CPU
 - 3-stock match
 - Damage-scaled knockback
 - Fixed cyber dojo stage
-- Original character and stage assets
+- Generated anthropomorphic fruit character motion frames
+
+## Build and Deploy
+
+```bash
+bun run build
+bun run deploy
+```
+
+`deploy` publishes `dist` to the `gh-pages` branch. GitHub Pages must be enabled for that branch; private repositories require an eligible GitHub plan.

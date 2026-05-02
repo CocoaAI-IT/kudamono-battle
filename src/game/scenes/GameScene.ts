@@ -212,7 +212,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   private updateHud(): void {
-    this.stockText.setText(`ASTRA ${'◆'.repeat(Math.max(0, this.player.stocks))}    VOLT ${'◆'.repeat(Math.max(0, this.cpu.stocks))}`);
+    this.stockText.setText(`${this.player.stats.shortName} ${'◆'.repeat(Math.max(0, this.player.stocks))}    ${this.cpu.stats.shortName} ${'◆'.repeat(Math.max(0, this.cpu.stocks))}`);
     this.damageText.setText(
       `1P ${Math.round(this.player.damage)}%    CPU ${Math.round(this.cpu.damage)}%`
     );
