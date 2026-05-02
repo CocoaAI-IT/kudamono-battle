@@ -15,6 +15,8 @@ export class PreloadScene extends Phaser.Scene {
     this.load.image('portrait-cherry', 'assets/ui/portrait-cherry-ninja.png');
     this.load.image('background-kitchen', 'assets/kitchen-stage.webp');
     const motions = ['idle', 'run', 'jump', 'quick', 'heavy', 'hurt'];
+    const characters = ['strawberry', 'banana', 'grape', 'watermelon', 'pineapple', 'cherry'];
+    const effectRoles = ['quick', 'heavy', 'projectile', 'trap', 'armor', 'combo'];
 
     for (const motion of motions) {
       this.load.image(`strawberry-${motion}`, `assets/characters/strawberry-samurai-${motion}.webp`);
@@ -23,6 +25,12 @@ export class PreloadScene extends Phaser.Scene {
       this.load.image(`watermelon-${motion}`, `assets/characters/watermelon-tank-${motion}.png`);
       this.load.image(`pineapple-${motion}`, `assets/characters/pineapple-trapper-${motion}.png`);
       this.load.image(`cherry-${motion}`, `assets/characters/cherry-ninja-${motion}.png`);
+    }
+
+    for (const character of characters) {
+      for (const role of effectRoles) {
+        this.load.image(`effect-${character}-${role}`, `assets/effects/${character}-${role}.png`);
+      }
     }
   }
 

@@ -104,6 +104,7 @@ export type AttackRuntime = {
   activeAt: number;
   expiresAt: number;
   rect: Phaser.GameObjects.Rectangle;
+  visual: Phaser.GameObjects.Image;
   hit: boolean;
   spec: AttackSpec;
   fixedPosition?: boolean;

@@ -179,13 +179,22 @@ export class GameScene extends Phaser.Scene {
       const attackType = attack.spec.attackType ?? 'melee';
 
       if (!attack.fixedPosition) {
-        attack.rect.setPosition(owner.sprite.x + direction * attack.spec.offsetX, owner.sprite.y + attack.spec.offsetY);
+        const x = owner.sprite.x + direction * attack.spec.offsetX;
+        const y = owner.sprite.y + attack.spec.offsetY;
+        attack.rect.setPosition(x, y);
+        attack.visual.setPosition(x, y);
+        attack.visual.setFlipX(direction === -1);
       } else if (active) {
-        attack.rect.x += (attack.velocityX ?? 0) * deltaSeconds;
-        attack.rect.y += (attack.velocityY ?? 0) * deltaSeconds;
+        const x = (attack.velocityX ?? 0) * deltaSeconds;
+        const y = (attack.velocityY ?? 0) * deltaSeconds;
+        attack.rect.x += x;
+        attack.rect.y += y;
+        attack.visual.x += x;
+        attack.visual.y += y;
       }
 
-      attack.rect.setVisible(active);
+      attack.rect.setVisible(false);
+      attack.visual.setVisible(active);
 
       if (active && this.canAttackHit(attack, now) && this.attackOverlapsFighter(attack, target)) {
         target.receiveHit(owner, attack);
@@ -197,6 +206,7 @@ export class GameScene extends Phaser.Scene {
         retainedAttacks.push(attack);
       } else {
         attack.rect.destroy();
+        attack.visual.destroy();
       }
     }
 

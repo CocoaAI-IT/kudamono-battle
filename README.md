@@ -54,6 +54,7 @@ Each fighter uses the same input grid: neutral/side/up/down plus normal or speci
 - Damage-scaled knockback
 - Six-character initial roster
 - Lightweight projectile, trap, armor, and multi-hit attack support
+- Image-based attack effects for slashes, shots, traps, armor, and combo hits
 - Generated kitchen stage with collision aligned to the cutting board and plates
 - Anthropomorphic fruit character motion frames and portraits
 

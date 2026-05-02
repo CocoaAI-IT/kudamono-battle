@@ -37,7 +37,6 @@ export class Fighter {
 
   private readonly scene: Phaser.Scene;
   private jumpWasHeld = false;
-  private attackEffect?: Phaser.GameObjects.Arc;
   private motion: FighterMotion = 'idle';
   private attackMotion: FighterMotion = 'quick';
   private hurtUntil = 0;
@@ -171,12 +170,10 @@ export class Fighter {
     const x = this.sprite.x + this.facing * spec.offsetX;
     const y = this.sprite.y + spec.offsetY;
     const color = this.getAttackColor(attackType, spec.button === 'normal' ? this.stats.tint : this.stats.accent);
-    const rect = this.scene.add.rectangle(x, y, spec.reach, spec.height, color, 0.18);
-    rect.setStrokeStyle(2, color, 0.75);
+    const rect = this.scene.add.rectangle(x, y, spec.reach, spec.height, color, 0);
     rect.setDepth(12);
     rect.setVisible(false);
-
-    this.showAttackArc(spec.motion, color);
+    const visual = this.createAttackVisual(spec, attackType, x, y);
 
     return {
       ownerId: this.id,
@@ -185,6 +182,7 @@ export class Fighter {
       activeAt: now + spec.windupMs,
       expiresAt: now + spec.windupMs + activeDuration,
       rect,
+      visual,
       hit: false,
       spec,
       fixedPosition: attackType === 'projectile' || attackType === 'trap',
@@ -292,30 +290,6 @@ export class Fighter {
     this.emitDodgeAfterimage();
   }
 
-  private showAttackArc(motion: FighterMotion, color: number): void {
-    this.attackEffect?.destroy();
-    const radius = motion === 'quick' ? 62 : 84;
-    this.attackEffect = this.scene.add.arc(
-      this.sprite.x + this.facing * 42,
-      this.sprite.y - 6,
-      radius,
-      this.facing === 1 ? -45 : 135,
-      this.facing === 1 ? 58 : 238,
-      false,
-      color,
-      motion === 'quick' ? 0.26 : 0.36
-    );
-    this.attackEffect.setStrokeStyle(motion === 'quick' ? 8 : 12, color, 0.82);
-    this.attackEffect.setDepth(11);
-    this.scene.tweens.add({
-      targets: this.attackEffect,
-      alpha: 0,
-      scale: 1.18,
-      duration: motion === 'quick' ? 140 : 210,
-      onComplete: () => this.attackEffect?.destroy()
-    });
-  }
-
   private getAttackColor(attackType: string, fallback: number): number {
     if (attackType === 'projectile') {
       return this.stats.accent;
@@ -330,6 +304,81 @@ export class Fighter {
     }
 
     return fallback;
+  }
+
+  private createAttackVisual(
+    spec: FighterStats['moves'][AttackKind],
+    attackType: string,
+    x: number,
+    y: number
+  ): Phaser.GameObjects.Image {
+    const role = this.resolveEffectRole(spec, attackType);
+    const visual = this.scene.add.image(x, y, `effect-${this.stats.characterKey}-${role}`);
+    visual.setDisplaySize(this.getEffectWidth(spec, role), this.getEffectHeight(spec, role));
+    visual.setDepth(13);
+    visual.setVisible(false);
+    visual.setAlpha(0.92);
+    visual.setFlipX(this.facing === -1);
+
+    if (spec.direction === 'up') {
+      visual.setAngle(this.facing === -1 ? -18 : 18);
+    } else if (spec.direction === 'down') {
+      visual.setAngle(this.facing === -1 ? 16 : -16);
+    }
+
+    return visual;
+  }
+
+  private resolveEffectRole(spec: FighterStats['moves'][AttackKind], attackType: string): string {
+    if (attackType === 'projectile') {
+      return 'projectile';
+    }
+
+    if (attackType === 'trap') {
+      return 'trap';
+    }
+
+    if (attackType === 'armor') {
+      return 'armor';
+    }
+
+    if (attackType === 'multiHit') {
+      return 'combo';
+    }
+
+    return spec.motion === 'heavy' ? 'heavy' : 'quick';
+  }
+
+  private getEffectWidth(spec: FighterStats['moves'][AttackKind], role: string): number {
+    if (role === 'projectile') {
+      return Math.max(spec.reach * 1.55, 82);
+    }
+
+    if (role === 'trap') {
+      return Math.max(spec.reach * 1.18, 116);
+    }
+
+    if (role === 'armor') {
+      return Math.max(spec.reach * 1.25, 132);
+    }
+
+    return Math.max(spec.reach * 1.35, 116);
+  }
+
+  private getEffectHeight(spec: FighterStats['moves'][AttackKind], role: string): number {
+    if (role === 'projectile') {
+      return Math.max(spec.height * 1.65, 58);
+    }
+
+    if (role === 'trap') {
+      return Math.max(spec.height * 1.7, 58);
+    }
+
+    if (role === 'armor') {
+      return Math.max(spec.height * 1.32, 92);
+    }
+
+    return Math.max(spec.height * 1.35, 72);
   }
 
   private emitJumpBurst(): void {
