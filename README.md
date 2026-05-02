@@ -56,6 +56,10 @@ Banana Brawler:
 - Generated kitchen stage with collision aligned to the cutting board and plates
 - Optimized WebP anthropomorphic fruit character motion frames
 
+## Docs
+
+- [Character and visual design](docs/character-design.md)
+
 ## Build and Deploy
 
 ```bash
