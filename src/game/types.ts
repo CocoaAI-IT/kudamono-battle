@@ -2,7 +2,7 @@ export type FighterId = 'player' | 'cpu';
 
 export type CharacterKey = 'strawberry' | 'banana' | 'grape' | 'watermelon' | 'pineapple' | 'cherry';
 
-export type StageKey = 'kitchen';
+export type StageKey = 'kitchen' | 'darkBoard';
 
 export type Facing = -1 | 1;
 

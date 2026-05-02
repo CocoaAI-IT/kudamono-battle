@@ -45,10 +45,30 @@ export const STAGES = {
         height: 24
       }
     ]
+  },
+  darkBoard: {
+    key: 'darkBoard',
+    name: 'Dark Board',
+    subtitle: 'Final Cutting Board',
+    description: 'A single flat dark cutting board with no floating side platforms.',
+    backgroundTexture: 'background-dark-board',
+    previewTexture: 'background-dark-board',
+    center: { x: GAME_WIDTH / 2, y: 430 },
+    playerSpawn: new Phaser.Math.Vector2(430, 286),
+    cpuSpawn: new Phaser.Math.Vector2(850, 286),
+    platforms: [
+      {
+        id: 'dark-cutting-board',
+        x: 640,
+        y: 424,
+        width: 1088,
+        height: 42
+      }
+    ]
   }
 } as const;
 
-export const STAGE_KEYS: StageKey[] = ['kitchen'];
+export const STAGE_KEYS: StageKey[] = ['kitchen', 'darkBoard'];
 
 export const STAGE_SELECT_CARDS: StageSelectCard[] = STAGE_KEYS.map((key) => ({
   key,

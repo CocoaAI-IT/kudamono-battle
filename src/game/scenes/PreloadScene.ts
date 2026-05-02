@@ -14,6 +14,7 @@ export class PreloadScene extends Phaser.Scene {
     this.load.image('portrait-pineapple', 'assets/ui/portrait-pineapple-trapper.png');
     this.load.image('portrait-cherry', 'assets/ui/portrait-cherry-ninja.png');
     this.load.image('background-kitchen', 'assets/kitchen-stage.webp');
+    this.load.image('background-dark-board', 'assets/dark-board-stage.jpg');
     const motions = ['idle', 'run', 'jump', 'quick', 'heavy', 'hurt'];
     const characters = ['strawberry', 'banana', 'grape', 'watermelon', 'pineapple', 'cherry'];
     const effectRoles = ['quick', 'heavy', 'projectile', 'trap', 'armor', 'combo'];

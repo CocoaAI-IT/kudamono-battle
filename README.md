@@ -55,7 +55,7 @@ Each fighter uses the same input grid: neutral/side/up/down plus normal or speci
 - Six-character initial roster
 - Lightweight projectile, trap, armor, and multi-hit attack support
 - Image-based attack effects for slashes, shots, traps, armor, and combo hits
-- Generated kitchen stage with collision aligned to the cutting board and plates
+- Stage select with a platform kitchen stage and a Final Destination style dark cutting board stage
 - Anthropomorphic fruit character motion frames and portraits
 
 ## Docs

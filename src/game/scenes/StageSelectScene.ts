@@ -36,7 +36,7 @@ export class StageSelectScene extends Phaser.Scene {
       color: '#fff7d6'
     });
 
-    this.add.text(72, 100, 'More stages can be added here as cards later.', {
+    this.add.text(72, 100, 'Pick a platform layout before the match starts.', {
       fontFamily: 'Inter, Arial, sans-serif',
       fontSize: '20px',
       color: '#d8f4ff'
